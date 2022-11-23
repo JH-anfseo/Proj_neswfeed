@@ -2,6 +2,7 @@
     <div class="profile form-floating mb-3">
         <img id="profileImg" width="50px" height="50px" src="/assets/unknown_profile.png" />
         <span id="nickname">닉네임</span>
+    <input id="Newedit" class="btn btn-secondary" type="submit" value="새 글 작성하기" onclick="show()">
     <input id="goMainBtn" class="btn btn-secondary" type="submit" value="메인화면으로 가기" onclick="goToMain()">
     </div>    
 </div>
@@ -21,10 +22,6 @@
     </div>
     <input id="submitBtn" class="btn btn-secondary" type="submit" value="작성완료" onclick="save_review(event)">
 </div>
-    <div class="review-list">
-        <div class="d-grid gap-2 col-6 mx-auto">
-            <button onclick="summit_bttn(event)" id="summit_bttn" class="btn btn-primary" type="submit">수정</button>
-            <button onclick="delete_bttn(event)" id="delete_bttn" class="btn btn-primary" type="submit">삭제</button>
-        </div>
-    </div>
+<div id="review-list">
 
+</div>
