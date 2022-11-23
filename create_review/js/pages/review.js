@@ -48,15 +48,12 @@ export const onEditing = (event) => {
   const cardBody = event.target.parentNode.parentNode;
   const commentText = cardBody.children[0].children[0];
   const commentText2 = cardBody.children[0].children[1];
-  const commentInputP = cardBody.children[0].children[3];
-  const commentInputP2 = cardBody.children[0].children[2];
+  const commentInputP = cardBody.children[0].children[2];
 
   commentText.classList.add("noDisplay");
   commentText2.classList.add("noDisplay");
   commentInputP.classList.add("d-flex");
-  commentInputP2.classList.add("d-flex");
   commentInputP.classList.remove("noDisplay");
-  commentInputP2.classList.remove("noDisplay");
   commentInputP.children[0].focus();
 };
 
@@ -64,7 +61,7 @@ export const update_comment = async (event) => {
   event.preventDefault();
   //이부분을 변경해야할것같음...
   console.log('event.targer:',event.target.parentNode.children);
-  const newComment = event.target.parentNode.children[0].value;
+  const newComment = event.target.parentNode.children[1].value;
   const movieComment = event.target.parentNode.children[0].value;
   const id = event.target.parentNode.id;
 
@@ -74,13 +71,8 @@ export const update_comment = async (event) => {
   commentText.classList.remove("noDisplay");
   commentText2.classList.remove("noDisplay");
   const commentInputP = parentNode.children[2];
-  const commentInputP2 = parentNode.children[3];
-  console.log('commentInputP:',commentInputP);
-  console.log('commentInputP2:',commentInputP2);
   commentInputP.classList.remove("d-flex");
-  commentInputP2.classList.remove("d-flex");
   commentInputP.classList.add("noDisplay");
-  commentInputP2.classList.add("noDisplay");
 
   const commentRef = doc(dbService, "reviews", id);
   try {
@@ -131,8 +123,10 @@ export const delete_comment = async (event) => {
                 <blockquote class="blockquote mb-0">
                     <p class="commentText">${cmtObj.movieTitle}</p>
                     <p class="commentText">${cmtObj.review}</p>
-                    <p id="${cmtObj.id}" class="noDisplay"><input class="newtitleInput" type="text" maxlength="30" /></p>
-                    <p id="${cmtObj.id}" class="noDisplay"><input class="newCmtInput" type="text" maxlength="30" /><button class="updateBtn" onclick="update_comment(event)">완료</button></p>
+                    <p id="${cmtObj.id}" class="noDisplay">
+                    <input class="newtitleInput" type="text" maxlength="30" />
+                    <input class="newCmtInput" type="text" maxlength="30" />
+                    <button class="updateBtn" onclick="update_comment(event)">완료</button></p>
                     <footer class="quote-footer"><div>BY&nbsp;&nbsp;<img class="cmtImg" width="50px" height="50px" src="${cmtObj.profileImg}" alt="profileImg" /><span>${
                     cmtObj.nickname ?? "닉네임 없음"}</span></div><div class="cmtAt">${new Date(cmtObj.createdAt).toString().slice(0, 25)}</div></footer>
                 </blockquote>
