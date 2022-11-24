@@ -1,4 +1,3 @@
-import { getStorage } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-storage.js";
 import {
   doc,
   addDoc,
@@ -9,36 +8,69 @@ import {
   query,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js";
-import { dbService, authService } from "../firebase.js";
+import {
+  ref,
+  getDownloadURL,
+  uploadString
+} from "https://www.gstatic.com/firebasejs/9.14.0/firebase-storage.js";
+import { v4 as uuidv4 } from "https://jspm.dev/uuid";
+import { dbService, authService, storageService }  from "../firebase.js";
 
 // Create API
 // reviews 라는 이름의 collection에 객체 형태의 Document를 신규 등록
+export const save_image = async () => {
+  const imgRef = ref(
+    storageService,
+    `movies/${authService.currentUser.uid}/${uuidv4()}`
+  );
+  const imgDataUrl = localStorage.getItem("imgDataUrl");
+  console.log('imgdataurl:',imgDataUrl)
+  let downloadUrl;
+  if (imgDataUrl) {
+    const response = await uploadString(imgRef, imgDataUrl, "data_url");
+    console.log('response :',response)
+    downloadUrl = await getDownloadURL(response.ref);
+    console.log(downloadUrl)
+    
+  }
+  return downloadUrl;
+};
+ 
+export const uploadImage = (event) => {
+        const theFile = event.target.files[0]; // file 객체
+        const reader = new FileReader();
+        reader.readAsDataURL(theFile); 
+        reader.onloadend = (finishedEvent) => {
+        const imgDataUrl = finishedEvent.currentTarget.result;
+        localStorage.setItem("imgDataUrl", imgDataUrl);
+ }; }
+
+
 export const save_review = async (event) => {
   event.preventDefault();
-  console.log(event.target);
-  console.log(authService);
   const review = document.getElementById("review");
   const movieTitle = document.getElementById("movieTitle")
-  const {uid,photoURL, displayName} = authService.currentUser;
+  const { uid, photoURL, displayName } = authService.currentUser;
   try {
     await addDoc(collection(dbService, "reviews"), {
-      movieTitle : movieTitle.value,
-      review : review.value,
+      movieTitle: movieTitle.value,
+      review: review.value,
       createdAt: Date.now(),
       creatorId: uid,
       profileImg: photoURL,
       nickname: displayName,
     });
     review.value = "",
-    movieTitle.value = "",
-    getReviewList();
+      movieTitle.value = "",
+      getReviewList();
     alert('리뷰저장')
   } catch (error) {
-    alert (error);
+    alert(error);
     console.log("error in addDoc")
   }
 }
-// 리뷰 수정
+
+// review 수정
 export const onEditing = (event) => {
   // 수정버튼 클릭
   event.preventDefault();
@@ -48,8 +80,10 @@ export const onEditing = (event) => {
   const cardBody = event.target.parentNode.parentNode;
   const commentText = cardBody.children[0].children[0];
   const commentText2 = cardBody.children[0].children[1];
-  const commentInputP = cardBody.children[0].children[2];
-
+  const commentInputP = cardBody.children[5];
+  console.log(
+    cardBody.children
+  );
   commentText.classList.add("noDisplay");
   commentText2.classList.add("noDisplay");
   commentInputP.classList.add("d-flex");
@@ -60,7 +94,7 @@ export const onEditing = (event) => {
 export const update_comment = async (event) => {
   event.preventDefault();
   //이부분을 변경해야할것같음...
-  console.log('event.targer:',event.target.parentNode.children);
+  console.log('event.targer:', event.target.parentNode.children);
   const newComment = event.target.parentNode.children[1].value;
   const movieComment = event.target.parentNode.children[0].value;
   const id = event.target.parentNode.id;
@@ -76,13 +110,14 @@ export const update_comment = async (event) => {
 
   const commentRef = doc(dbService, "reviews", id);
   try {
-    await updateDoc(commentRef, {movieTitle:movieComment, review: newComment });
-    getReviewList();
+    await updateDoc(commentRef, { movieTitle: movieComment, review: newComment });
+    myReviewList();
   } catch (error) {
     alert(error);
   }
 };
-//리뷰 삭제
+
+// review 삭제
 export const delete_comment = async (event) => {
   event.preventDefault();
   const id = event.target.name;
@@ -90,57 +125,64 @@ export const delete_comment = async (event) => {
   if (ok) {
     try {
       await deleteDoc(doc(dbService, "reviews", id));
-      getReviewList();
+      myReviewList();
     } catch (error) {
       alert(error);
     }
   }
 };
-// 리뷰 리스트
-  export const getReviewList = async () => {
-    let cmtObjList = [];
-    const q = query(
-      collection(dbService, "reviews"),
-      orderBy("createdAt", "desc")
-    );
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      console.log(doc.data());
-      const commentObj = {
-        ...doc.data(),
-        id: doc.id
-      };
-      cmtObjList.push(commentObj);
-    });
-    const commnetList = document.getElementById("review-list");
-    const currentUid = authService.currentUser.uid;
-    commnetList.innerHTML = "";
-    cmtObjList.forEach((cmtObj) => {
-      const isOwner = currentUid === cmtObj.creatorId;
-      const temp_html = 
-        `<div class="card commentCard">
+
+export const myReviewList = async () => {
+  let cmtObjList = [];
+  const q = query(
+    collection(dbService, "reviews"),
+    orderBy("createdAt", "desc")
+  );
+  const querySnapshot = await getDocs(q);
+  querySnapshot.forEach((doc) => {
+    console.log(doc.data());
+    const commentObj = {
+      ...doc.data(),
+      id: doc.id
+    };
+    cmtObjList.push(commentObj);
+  });
+  const commentList = document.getElementById("my-review-list");
+  const currentUid = authService.currentUser.uid;
+  commentList.innerHTML = "";
+  cmtObjList.forEach((cmtObj) => {
+    const isOwner = currentUid === cmtObj.creatorId;
+    const temp_html =
+        `<div class="commentCard">
             <div class="card-body">
+                <div class="cmtAt">${new Date(cmtObj.createdAt).toString().slice(0, 15)}</div>
                 <blockquote class="blockquote mb-0">
-                    <p class="commentText">${cmtObj.movieTitle}</p>
-                    <p class="commentText">${cmtObj.review}</p>
-                    <p id="${cmtObj.id}" class="noDisplay">
-                    <input class="newtitleInput" type="text" maxlength="30" />
-                    <input class="newCmtInput" type="text" maxlength="30" />
-                    <button class="updateBtn" onclick="update_comment(event)">완료</button></p>
-                    <footer class="quote-footer"><div>BY&nbsp;&nbsp;<img class="cmtImg" width="50px" height="50px" src="${cmtObj.profileImg}" alt="profileImg" /><span>${
-                    cmtObj.nickname ?? "닉네임 없음"}</span></div><div class="cmtAt">${new Date(cmtObj.createdAt).toString().slice(0, 25)}</div></footer>
+                <div class="content">
+                    <div class="nick-n"><img class="cmtImg" width="50px" height="50px" src="${cmtObj.profileImg}" alt="profileImg" />
+                        <span>${cmtObj.nickname ?? "닉네임 없음"}</span>
+                    </div>
+                    <a href="#" class="fa fa-heart-o option-card"><span>18</span></a>
+                </p>
+                <p class="commentText title">${cmtObj.movieTitle}</p>
+                <p class="commentText review-text">${cmtObj.review}</p>
+                <p id="${cmtObj.id}" class="noDisplay">
+                <input class="newtitleInput" type="text" maxlength="30" />
+                <input class="newCmtInput" type="text" maxlength="30" />
+                <button class="updateBtn" onclick="update_comment(event)">완료</button>
+                <div id= "card-btn"class="${isOwner ? "updateBtns" : "noDisplay"}">
+                <button onclick="onEditing(event)" class="editBtn btn btn-dark">수정</button>
+                <button name="${cmtObj.id}" onclick="delete_comment(event)" class="deleteBtn btn btn-dark">삭제</button>
+                </div> 
                 </blockquote>
-                <div class="${isOwner ? "updateBtns" : "noDisplay"}">
-                     <button onclick="onEditing(event)" class="editBtn btn btn-dark">수정</button>
-                  <button name="${
-                    cmtObj.id
-                  }" onclick="delete_comment(event)" class="deleteBtn btn btn-dark">삭제</button>
-                </div>            
               </div>
-       </div>`;
-      const div = document.createElement("div");
-      div.classList.add("mycards");
-      div.innerHTML = temp_html;
-      commnetList.appendChild(div);
-    });
-  };
+            </div>
+          </div>`;
+    const div = document.createElement("div");
+    div.classList.add("mycards");
+    div.innerHTML = temp_html;
+    commentList.appendChild(div);
+    // if(isOwner !== cmtObj.id) {
+    //   temp_html.remove();
+    // }
+  })
+}
