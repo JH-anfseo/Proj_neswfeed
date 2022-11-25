@@ -18,6 +18,7 @@ import { dbService, authService, storageService }  from "../firebase.js";
 
 // Create API
 // reviews 라는 이름의 collection에 객체 형태의 Document를 신규 등록
+
 export const save_image = async () => {
   const imgRef = ref(
     storageService,
@@ -42,35 +43,38 @@ export const uploadImage = (event) => {
         reader.readAsDataURL(theFile); 
         reader.onloadend = (finishedEvent) => {
         const imgDataUrl = finishedEvent.currentTarget.result;
+        console.log(imgDataUrl)
         localStorage.setItem("imgDataUrl", imgDataUrl);
+        
  }; }
-
 
 export const save_review = async (event) => {
   event.preventDefault();
   const review = document.getElementById("review");
-  const movieTitle = document.getElementById("movieTitle")
+  const movieTitle = document.getElementById("movieTitle");
+  let movieImage = await save_image();
   const { uid, photoURL, displayName } = authService.currentUser;
   try {
     await addDoc(collection(dbService, "reviews"), {
-      movieTitle: movieTitle.value,
-      review: review.value,
+      movieTitle : movieTitle.value,
+      review : review.value,
+      movieImage : movieImage,
       createdAt: Date.now(),
       creatorId: uid,
       profileImg: photoURL,
       nickname: displayName,
     });
     review.value = "",
-      movieTitle.value = "",
-      getReviewList();
-    alert('리뷰저장')
+    movieTitle.value = "",
+    movieImage = "",
+    alert('리뷰를 저장했습니다.')
+    myReviewList();
   } catch (error) {
-    alert(error);
+    alert (error);
     console.log("error in addDoc")
   }
 }
 
-// review 수정
 export const onEditing = (event) => {
   // 수정버튼 클릭
   event.preventDefault();
@@ -93,8 +97,7 @@ export const onEditing = (event) => {
 
 export const update_comment = async (event) => {
   event.preventDefault();
-  //이부분을 변경해야할것같음...
-  console.log('event.targer:', event.target.parentNode.children);
+  console.log('event.target:', event.target.parentNode.children);
   const newComment = event.target.parentNode.children[1].value;
   const movieComment = event.target.parentNode.children[0].value;
   const id = event.target.parentNode.id;
@@ -132,6 +135,9 @@ export const delete_comment = async (event) => {
   }
 };
 
+
+
+//내 review list
 export const myReviewList = async () => {
   let cmtObjList = [];
   const q = query(
@@ -149,40 +155,54 @@ export const myReviewList = async () => {
   });
   const commentList = document.getElementById("my-review-list");
   const currentUid = authService.currentUser.uid;
+ 
   commentList.innerHTML = "";
   cmtObjList.forEach((cmtObj) => {
     const isOwner = currentUid === cmtObj.creatorId;
+    console.log(cmtObj.creatorId)
+    console.log(isOwner)
     const temp_html =
-        `<div class="commentCard">
-            <div class="card-body">
-                <div class="cmtAt">${new Date(cmtObj.createdAt).toString().slice(0, 15)}</div>
-                <blockquote class="blockquote mb-0">
-                <div class="content">
-                    <div class="nick-n"><img class="cmtImg" width="50px" height="50px" src="${cmtObj.profileImg}" alt="profileImg" />
-                        <span>${cmtObj.nickname ?? "닉네임 없음"}</span>
-                    </div>
-                    <a href="#" class="fa fa-heart-o option-card"><span>18</span></a>
-                </p>
-                <p class="commentText title">${cmtObj.movieTitle}</p>
-                <p class="commentText review-text">${cmtObj.review}</p>
-                <p id="${cmtObj.id}" class="noDisplay">
-                <input class="newtitleInput" type="text" maxlength="30" />
-                <input class="newCmtInput" type="text" maxlength="30" />
-                <button class="updateBtn" onclick="update_comment(event)">완료</button>
-                <div id= "card-btn"class="${isOwner ? "updateBtns" : "noDisplay"}">
-                <button onclick="onEditing(event)" class="editBtn btn btn-dark">수정</button>
-                <button name="${cmtObj.id}" onclick="delete_comment(event)" class="deleteBtn btn btn-dark">삭제</button>
-                </div> 
-                </blockquote>
-              </div>
+    `<div class="my-comment-card">
+      <div class="card-body my-card-body" style="background:url(${cmtObj.movieImage}) 20% 1% / cover no-repeat;">
+          <div class="my-cmtAt">${new Date(cmtObj.createdAt).toString().slice(0, 15)}</div>
+          <blockquote class="blockquote my-mb-0">
+            <div class="my-content">
+              <p class="commentText my-title">${cmtObj.movieTitle}</p>
+              <p class="commentText my-review-text">${cmtObj.review}</p>
+              <p id="${cmtObj.id}" class="noDisplay">
+              <input class="newtitleInput" type="text" maxlength="30" />
+              <input class="newCmtInput" type="text" maxlength="30" />
+              <button class="updateBtn" onclick="update_comment(event)">완료</button>
+              <div id= "my-card-btn"class="${isOwner ? "updateBtns" : "noDisplay"}">
+              <button onclick="onEditing(event)" class="editBtn btn btn-dark">수정</button>
+              <button name="${cmtObj.id}" onclick="delete_comment(event)" class="deleteBtn btn btn-dark">삭제</button>
+              </div> 
             </div>
-          </div>`;
-    const div = document.createElement("div");
+          </blockquote>
+      </div>
+  </div>`;
+
+  const div = document.createElement("div");
     div.classList.add("mycards");
     div.innerHTML = temp_html;
-    commentList.appendChild(div);
-    // if(isOwner !== cmtObj.id) {
-    //   temp_html.remove();
-    // }
-  })
+    
+    if(isOwner == true) {
+      //temp_html.remove();
+      commentList.appendChild(div);
+    }
+  
+  });
 }
+
+// 글쓰기 toggle기능
+export const writeToggle = () => {
+  const postContainer = document.querySelector("#writePost");
+  const writeBtn = document.querySelector("#writeBtn");
+  if(writeBtn.value === '글쓰기'){
+    postContainer.style.display = "block"
+    writeBtn.value = "숨기기";
+  } else {
+    postContainer.style.display = "none"
+    writeBtn.value = "글쓰기";
+  }
+};
