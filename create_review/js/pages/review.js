@@ -99,17 +99,18 @@ export const update_comment = async (event) => {
   commentText.classList.remove("noDisplay");
   commentText2.classList.remove("noDisplay");
   const commentInputP = parentNode.children[3];
-
+  console.log(parentNode.children)
   commentInputP.classList.remove("d-flex");
   commentInputP.classList.add("noDisplay");
-  console.log(event.target.parentNode.children);
   const commentRef = doc(dbService, "reviews", id);
   try {
     await updateDoc(commentRef, { movieTitle: movieComment, review: newComment });
     myReviewList();
+    alert('수정완료!')
   } catch (error) {
     alert(error);
   }
+  window.location.reload();
 };
 
 // review 삭제
@@ -121,10 +122,12 @@ export const delete_comment = async (event) => {
     try {
       await deleteDoc(doc(dbService, "reviews", id));
       myReviewList();
+      alert('삭제완료!')
     } catch (error) {
       alert(error);
     }
   }
+  window.location.reload();
 };
 
 //내 review list
@@ -153,10 +156,10 @@ export const myReviewList = async () => {
     <div class="card-body my-card-body" style="background:url(${cmtObj.movieImage}) 20% 1% / cover no-repeat;">
         <blockquote class="blockquote my-mb-0">
           <div class="my-content">
-            <button id="open-review" data-id="${cmtObj.id}" onclick="window.openMyReview(event)">자세히 보기</button>
             <div class="my-cmtAt">${new Date(cmtObj.createdAt).toString().slice(0, 15)}</div>
             <p class="commentText my-title">${cmtObj.movieTitle}</p>
             <p class="commentText my-review-text">${cmtObj.review}</p> 
+            <button id="open-review" data-id="${cmtObj.id}" onclick="window.openMyReview(event)">자세히 보기</button>
           </div>
         </blockquote>
     </div>
@@ -218,13 +221,13 @@ export const openMyReview = async (event) => {
             <div class="my-content">
               <div class="my-cmtAt">${new Date(asd.createdAt).toString().slice(0, 15)}</div>
               <p class="commentText my-title" style="color:black">${asd.movieTitle}</p>
-              <p class="commentText my-review-text" style="color:black">${asd.review}</p>
+              <p class="commentText my-review-text"  style="color:black">${asd.review}</p>
               <p id="${asd.id}" class="noDisplay changeinput">
               <input class="newtitleInput" type="text" maxlength="30" />
-              <textarea class="newCmtInput" placeholder="Leave a comment here" id="review" style="height: 300px"></textarea>
+              <textarea class="newCmtInput" placeholder="Leave a comment here" style="height: 300px"></textarea>
               <button class="updateBtn" onclick="update_comment(event)">완료</button></p>
               <div id= "my-card-btn"class="${isOwner ? "updateBtns" : "noDisplay"}">
-                <button onclick="onEditing(event)" class="editBtn btn btn-dark">수정</button>
+                <button onclick="onEditing(event)" id="hide-btn" class="editBtn btn btn-dark">수정</button>
                 <button name="${asd.id}" onclick="delete_comment(event)" class="deleteBtn btn btn-dark">삭제</button>
               </div> 
             </div>

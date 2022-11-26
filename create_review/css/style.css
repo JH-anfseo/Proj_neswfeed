@@ -530,7 +530,7 @@ list-style: none;
 }
 .my-card-body .my-content > button {
   display: block;
-  margin: 0 auto;
+  margin: 20px auto 0;
   width: 250px;
   color: #61efc7;
   background-color: transparent;
