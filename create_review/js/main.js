@@ -7,9 +7,12 @@ import {
     onEditing, 
     delete_comment,
     uploadImage,
-    writeToggle
+    writeToggle,
+    openMyReview,
+    closeMyReviewModal,
+    searchBar,
 } from './pages/review.js';
-import { getcomments } from "./pages/loginMain.js";
+import { getcomments, openReview, closeMainReviewModal } from "./pages/loginMain.js";
 import {
     closeModal,
     handleClickModal,
@@ -57,12 +60,17 @@ window.save_review = save_review;
 window.closeModal = closeModal;
 window.handleClickModal = handleClickModal;
 window.changeProfile = changeProfile;
-window.onFileChange = onFileChange;;
+window.onFileChange = onFileChange;
 
 window.getcomments = getcomments;
+window.openReview = openReview;
+window.closeMainReviewModal = closeMainReviewModal;
 
 window.update_comment = update_comment;
 window.onEditing = onEditing;
 window.delete_comment = delete_comment;
 window.uploadImage = uploadImage;
-window.writeToggle = writeToggle
+window.writeToggle = writeToggle;
+window.searchBar = searchBar;
+window.openMyReview = openMyReview;
+window.closeMyReviewModal = closeMyReviewModal;
