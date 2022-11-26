@@ -509,7 +509,7 @@ list-style: none;
   border: none;
   border-radius: 20px;
   padding: 10px 0;
-  font-size: 0.75em;
+  font-size: 1em;
   transition: all 0.2s;
 }
 .my-content #my-card-btn button:hover {
@@ -547,12 +547,32 @@ list-style: none;
   gap: 5px;
 }
 .noDisplay {
-  display: none;
+  display: none !important;
 }
 .updateBtn {
-  position: absolute;
-  left: 0;
-  min-width: 70px;
+  margin: 0 auto;
+  width: 250px;
+  color: #fff;
+  background-color: #61efc7;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 0;
+}
+.changeinput {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.1em;
+}
+.changeinput .newtitleInput{
+  height: 50px;
+  margin-top: 20px;
+  background-color: rgb(238, 238, 238);
+  border: none;
+}
+.changeinput .newCmtInput {
+  margin: 10px 0 30px;
+  background-color: rgb(238, 238, 238);
+  border: none;
 }
 /* profile */
 .modal {
@@ -669,6 +689,8 @@ list-style: none;
 .btn-gear {
   margin-right: 5px;
 }
+
+
 /* review-modal style */
 .review-modal,.main-review-modal {
   position: fixed;
@@ -680,7 +702,6 @@ list-style: none;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 9999;
 }
-
 .review-modal.show, .main-review-modal.show {
   display: block;
 }
@@ -714,10 +735,10 @@ list-style: none;
   overflow: hidden;
 }
 .main-cards .my-content,#review-content .mycards .my-content{
-  float: right;
+  float: left;
   width: 500px;
-  height: 600px;
-  padding: 30px;
+  height: 580px;
+  padding: 30px 20px 30px 40px;
   overflow-y: auto;
 }
 .main-cards .my-content .my-title,#review-content .mycards .my-title {
@@ -800,16 +821,19 @@ list-style: none;
     width: 700px;
     height: 570px;
   }
-  .main-cards .card-img-top {
+  .main-cards .card-img-top
+  ,#review-content .mycards .card-img-top {
     width: 300px;
     height: 480px;
   }
-  .main-cards .my-content {
+  .main-cards .my-content
+  ,#review-content .mycards .my-content {
     width: 320px;
     height: 460px;
     padding: 20px;
   }
-  .main-cards .my-content .my-title {
+  .main-cards .my-content .my-title
+  ,#review-content .mycards .my-title {
     font-size: 2em;
     padding: 5px 0;
   }
@@ -850,14 +874,21 @@ list-style: none;
   .review-modal-body, .main-review-modal-body > #removeModal {
     margin: 10px;
   }
-  .main-cards .card-img-top {
+  .main-cards .card-img-top
+  ,#review-content .mycards .card-img-top {
     width: 400px;
     height: 580px;
   }
-  .main-cards .my-content {
+  .main-cards .my-content
+  ,#review-content .mycards .my-content {
     float: left;
     width: 400px;
     height: 130px;
     overflow-y: visible;
   }
+}
+
+.chageinput {
+  display: flex;
+  flex-direction: column;
 }

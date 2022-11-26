@@ -77,7 +77,6 @@ export const onEditing = (event) => {
   event.preventDefault();
   const udBtns = document.querySelectorAll(".editBtn, .deleteBtn");
   udBtns.forEach((udBtn) => (udBtn.disabled = "true"));
-
   const cardBody = event.target.parentNode.parentNode;
   const commentText = cardBody.children[4].children[0];
   const commentText2 = cardBody.children[4].children[1];
@@ -91,7 +90,6 @@ export const onEditing = (event) => {
 
 export const update_comment = async (event) => {
   event.preventDefault();
-  
   const newComment = event.target.parentNode.children[1].value;
   const movieComment = event.target.parentNode.children[0].value;
   const id = event.target.parentNode.id;
@@ -104,7 +102,7 @@ export const update_comment = async (event) => {
 
   commentInputP.classList.remove("d-flex");
   commentInputP.classList.add("noDisplay");
-
+  console.log(event.target.parentNode.children);
   const commentRef = doc(dbService, "reviews", id);
   try {
     await updateDoc(commentRef, { movieTitle: movieComment, review: newComment });
@@ -221,10 +219,10 @@ export const openMyReview = async (event) => {
               <div class="my-cmtAt">${new Date(asd.createdAt).toString().slice(0, 15)}</div>
               <p class="commentText my-title" style="color:black">${asd.movieTitle}</p>
               <p class="commentText my-review-text" style="color:black">${asd.review}</p>
-              <p id="${asd.id}" class="noDisplay">
+              <p id="${asd.id}" class="noDisplay changeinput">
               <input class="newtitleInput" type="text" maxlength="30" />
               <textarea class="newCmtInput" placeholder="Leave a comment here" id="review" style="height: 300px"></textarea>
-              <button class="updateBtn" onclick="update_comment(event)">완료</button>
+              <button class="updateBtn" onclick="update_comment(event)">완료</button></p>
               <div id= "my-card-btn"class="${isOwner ? "updateBtns" : "noDisplay"}">
                 <button onclick="onEditing(event)" class="editBtn btn btn-dark">수정</button>
                 <button name="${asd.id}" onclick="delete_comment(event)" class="deleteBtn btn btn-dark">삭제</button>
