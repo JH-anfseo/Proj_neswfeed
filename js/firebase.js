@@ -11,7 +11,7 @@ const firebaseConfig = {
   projectId: "newsfeed-b24f2",
   storageBucket: "newsfeed-b24f2.appspot.com",
   messagingSenderId: "886076778178",
-  appId: "1:886076778178:web:21ffc37bd955a6f8037d5b",
+  appId: "1:886076778178:web:a8b73ebfde47cee9037d5b",
 };
 
 // Initialize Firebase
